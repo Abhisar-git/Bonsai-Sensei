@@ -13,9 +13,9 @@ export async function POST(request: Request) {
       ? (body.messages as ChatMessage[])
       : [];
 
-    const { reply, sources, season } = craftReply(messages);
+    const { reply, sources, phase } = craftReply(messages);
 
-    return NextResponse.json({ reply, sources, season });
+    return NextResponse.json({ reply, sources, phase });
   } catch {
     return NextResponse.json(
       { error: "Could not read your message. Please try again." },
