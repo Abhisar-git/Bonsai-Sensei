@@ -1,55 +1,64 @@
-import { knowledgeBase, seasonNotes } from "./knowledge";
+import { knowledgeBase, phaseNotes } from "./knowledge";
 
 type ChatMessage = {
   role: "user" | "assistant";
   content: string;
 };
 
-type Season = "Spring" | "Summer" | "Autumn" | "Winter";
+type Phase = "Hook" | "Build" | "Reversal" | "Finale";
 
 type ReplyPayload = {
   reply: string;
   sources: string[];
-  season: Season;
+  phase: Phase;
 };
 
 const greetings = [
-  "Welcome. Set your tree on the bench and tell me what you see.",
-  "Good to see you. What is the tree asking for today?",
-  "I am here. Describe the tree, and we will take it step by step.",
+  "Welcome. Tell me the premise and the danger at the center.",
+  "Good. What secret are you keeping from the reader right now?",
+  "I am listening. Give me the protagonist, the fear, and the clock.",
 ];
 
 const gratitudeReplies = [
-  "Anytime. Keep me posted on how the tree responds.",
-  "Glad to help. One calm adjustment at a time.",
-  "Always. Small moves create big change in bonsai.",
+  "Anytime. Tighten the next scene and send it over.",
+  "Glad to help. Push the pressure one beat further.",
+  "Always. Keep the suspense honest and the choices costly.",
 ];
 
 const followUps = [
-  "What species are you working with?",
-  "Is this tree indoors or outdoors?",
-  "How long has it been in the current pot and soil?",
-  "What does the new growth look like right now?",
+  "What is the protagonist afraid to lose?",
+  "Where does the ticking clock show up on the page?",
+  "Which scene is your current midpoint reversal?",
+  "What decision ends your last chapter?",
 ];
 
-const helpReply = `I can help with watering rhythm, light placement, pruning, wiring, repot timing, and troubleshooting.
+const helpReply = `I can help with hooks, escalations, twists, pacing, and scene diagnostics.
 
 Try asking:
-- "My leaves are yellowing and soft"
-- "Should I repot a juniper in spring?"
-- "How do I reduce leaf size on a ficus?"`;
+- "Give me a hook for a locked-room thriller"
+- "How do I design a midpoint reversal?"
+- "Why do my scenes feel low tension?"`;
 
-const urgentTriggers = ["dying", "dropping", "yellow", "brown", "mushy", "soft", "wilting", "shrivel"];
+const urgencyTriggers = [
+  "stuck",
+  "flat",
+  "boring",
+  "slow",
+  "no tension",
+  "no stakes",
+  "confusing",
+];
 const helpTriggers = ["help", "topics", "what can you do", "guide", "menu"];
 const thanksTriggers = ["thanks", "thank you", "appreciate"];
 const greetingTriggers = ["hi", "hello", "hey", "greetings", "good morning", "good evening"];
 
 const synonymMap: Record<string, string[]> = {
-  water: ["watering", "moist", "moisture", "thirst"],
-  light: ["sun", "sunlight", "bright", "shade"],
-  soil: ["akadama", "pumice", "lava"],
-  repot: ["repotting", "root", "roots"],
-  pests: ["aphids", "mites", "scale", "bugs"],
+  hook: ["opening", "inciting", "disturbance"],
+  stakes: ["risk", "pressure", "cost"],
+  twist: ["reversal", "reveal", "surprise"],
+  clock: ["deadline", "time", "ticking"],
+  clues: ["trail", "investigation", "mystery"],
+  pacing: ["rhythm", "tempo"],
 };
 
 const pick = (items: string[]) => items[Math.floor(Math.random() * items.length)];
@@ -80,12 +89,12 @@ const tokenize = (text: string) => {
 const hasAny = (text: string, triggers: string[]) =>
   triggers.some((trigger) => text.includes(trigger));
 
-const getSeason = (date = new Date()): Season => {
+const getPhase = (date = new Date()): Phase => {
   const month = date.getMonth();
-  if (month >= 2 && month <= 4) return "Spring";
-  if (month >= 5 && month <= 7) return "Summer";
-  if (month >= 8 && month <= 10) return "Autumn";
-  return "Winter";
+  if (month >= 0 && month <= 2) return "Hook";
+  if (month >= 3 && month <= 5) return "Build";
+  if (month >= 6 && month <= 8) return "Reversal";
+  return "Finale";
 };
 
 const rankKnowledge = (text: string) => {
@@ -110,14 +119,14 @@ const rankKnowledge = (text: string) => {
 
 export const craftReply = (messages: ChatMessage[]): ReplyPayload => {
   const lastUser = [...messages].reverse().find((message) => message.role === "user");
-  const season = getSeason();
+  const phase = getPhase();
 
   if (!lastUser || !lastUser.content.trim()) {
     return {
       reply:
-        "Tell me about your tree: species, where it lives, and what you are noticing.",
+        "Give me your premise in one sentence and the threat in one sentence.",
       sources: [],
-      season,
+      phase,
     };
   }
 
@@ -127,7 +136,7 @@ export const craftReply = (messages: ChatMessage[]): ReplyPayload => {
     return {
       reply: `${pick(greetings)}\n\n${pick(followUps)}`,
       sources: [],
-      season,
+      phase,
     };
   }
 
@@ -135,7 +144,7 @@ export const craftReply = (messages: ChatMessage[]): ReplyPayload => {
     return {
       reply: pick(gratitudeReplies),
       sources: [],
-      season,
+      phase,
     };
   }
 
@@ -143,15 +152,15 @@ export const craftReply = (messages: ChatMessage[]): ReplyPayload => {
     return {
       reply: helpReply,
       sources: [],
-      season,
+      phase,
     };
   }
 
   const matches = rankKnowledge(cleaned).slice(0, 3);
-  const seasonalNote = seasonNotes[season];
-  const urgent = hasAny(cleaned, urgentTriggers);
+  const phaseNote = phaseNotes[phase];
+  const urgent = hasAny(cleaned, urgencyTriggers);
 
-  const intro = `Season focus: ${season} - ${seasonalNote.focus}. ${seasonalNote.detail}`;
+  const intro = `Phase focus: ${phase} - ${phaseNote.focus}. ${phaseNote.detail}`;
   const responseParts: string[] = [intro];
 
   if (matches.length) {
@@ -164,13 +173,13 @@ export const craftReply = (messages: ChatMessage[]): ReplyPayload => {
     responseParts.push("Try this next:", topTips.join("\n"));
   } else {
     responseParts.push(
-      "I can be more precise with a few details: species, pot size, light exposure, and the symptom timeline."
+      "I can be more precise with a few details: protagonist goal, antagonist pressure, and the current scene outcome."
     );
   }
 
   if (urgent) {
     responseParts.push(
-      "Urgent care: pause heavy pruning, move the tree to bright shade, and check the roots for sour smell or mushy sections."
+      "Rapid fix: add a clock, force a hard choice, and end the scene on a cost that cannot be undone."
     );
   }
 
@@ -179,6 +188,6 @@ export const craftReply = (messages: ChatMessage[]): ReplyPayload => {
   return {
     reply: responseParts.join("\n\n"),
     sources: matches.map((match) => match.title),
-    season,
+    phase,
   };
-};
+};

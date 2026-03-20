@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { quickPrompts, rituals, seasonNotes } from "@/lib/knowledge";
+import { quickPrompts, rituals, phaseNotes } from "@/lib/knowledge";
 
 type ChatMessage = {
   id: string;
@@ -11,7 +11,7 @@ type ChatMessage = {
   stamp: string;
 };
 
-type Season = "Spring" | "Summer" | "Autumn" | "Winter";
+type Phase = "Hook" | "Build" | "Reversal" | "Finale";
 
 const timeStamp = () =>
   new Intl.DateTimeFormat("en-US", {
@@ -19,12 +19,12 @@ const timeStamp = () =>
     minute: "2-digit",
   }).format(new Date());
 
-const getSeason = (date = new Date()): Season => {
+const getPhase = (date = new Date()): Phase => {
   const month = date.getMonth();
-  if (month >= 2 && month <= 4) return "Spring";
-  if (month >= 5 && month <= 7) return "Summer";
-  if (month >= 8 && month <= 10) return "Autumn";
-  return "Winter";
+  if (month >= 0 && month <= 2) return "Hook";
+  if (month >= 3 && month <= 5) return "Build";
+  if (month >= 6 && month <= 8) return "Reversal";
+  return "Finale";
 };
 
 const makeId = () => {
@@ -41,8 +41,8 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const season = useMemo(() => getSeason(), []);
-  const seasonNote = seasonNotes[season];
+  const phase = useMemo(() => getPhase(), []);
+  const phaseNote = phaseNotes[phase];
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -105,56 +105,55 @@ export default function Home() {
         <div className="brand">
           <div className="brand-mark" />
           <div>
-            <div className="brand-title">Bonsai Sensei</div>
-            <div className="brand-subtitle">Quiet care companion</div>
+            <div className="brand-title">Suspense Studio</div>
+            <div className="brand-subtitle">Thriller craft companion</div>
           </div>
         </div>
-        <div className="chip">Session ready</div>
+        <div className="chip">Writer mode</div>
       </header>
 
       <main className="layout">
         <section className="panel">
           <div>
-            <h1 className="panel-title">A living studio for tiny forests.</h1>
+            <h1 className="panel-title">A calm room for dangerous stories.</h1>
             <p className="panel-lede">
-              Bonsai Sensei is trained on bonsai care rituals and seasonal
-              guidance. Ask about watering, repotting, design balance, or a
-              specific species, and it will reply with calm, practical steps.
+              Suspense Studio is trained on high-tension thriller techniques.
+              Ask about hooks, stakes, reversals, and scene pressure, and it
+              will answer with practical steps and a clear next move.
             </p>
           </div>
 
           <div className="chip-row">
-            <span className="chip">Indoor Care</span>
-            <span className="chip">Outdoor Care</span>
-            <span className="chip">Seasonal Rhythm</span>
-            <span className="chip">Design Flow</span>
+            <span className="chip">Hook Craft</span>
+            <span className="chip">Tension Curve</span>
+            <span className="chip">Twist Logic</span>
+            <span className="chip">Scene Pressure</span>
           </div>
 
           <div className="card-grid">
             <div className="card">
-              <div className="card-label">Season Lens</div>
-              <div className="card-title">{season}</div>
-              <p className="card-body">{seasonNote.detail}</p>
+              <div className="card-label">Phase Lens</div>
+              <div className="card-title">{phase}</div>
+              <p className="card-body">{phaseNote.detail}</p>
             </div>
             <div className="card">
               <div className="card-label">Current Focus</div>
-              <div className="card-title">{seasonNote.focus}</div>
+              <div className="card-title">{phaseNote.focus}</div>
               <p className="card-body">
-                Match pruning, watering, and feeding to the seasonal energy of
-                the tree.
+                Align the reveal, the pressure, and the choice in each scene.
               </p>
             </div>
             <div className="card">
               <div className="card-label">Studio Mood</div>
-              <div className="card-title">Slow and precise</div>
+              <div className="card-title">Clear and relentless</div>
               <p className="card-body">
-                Small adjustments, clean cuts, and steady observation.
+                Cut the soft beats, keep the threat present, and move fast.
               </p>
             </div>
           </div>
 
           <div>
-            <div className="card-label">Daily Rituals</div>
+            <div className="card-label">Draft Rituals</div>
             <div className="ritual-list">
               {rituals.map((ritual) => (
                 <div className="ritual" key={ritual.name}>
@@ -166,27 +165,27 @@ export default function Home() {
           </div>
 
           <div className="panel-footer">
-            <span>Built for mindful caretaking.</span>
-            <span>Ask as if you are standing at the bench.</span>
+            <span>Built for tension you can feel.</span>
+            <span>Bring a scene. Leave with a sharper edge.</span>
           </div>
         </section>
 
         <section className="chat-panel">
           <div className="chat-header">
-            <h2>Care Session</h2>
+            <h2>Story Session</h2>
             <div className="status">
-              {isLoading ? "Listening" : "Ready"} - {season}
+              {isLoading ? "Listening" : "Ready"} - {phase}
             </div>
           </div>
 
           <div className="chat-window">
             {messages.length === 0 ? (
               <div className="empty-state">
-                <div className="empty-title">Begin with a clear observation.</div>
+                <div className="empty-title">Start with the danger.</div>
                 <p className="empty-body">
-                  The sensei listens best to details: species, light exposure,
-                  watering rhythm, and the symptom you notice. Try one of these
-                  prompts to start.
+                  The studio listens best to specifics: protagonist goal,
+                  antagonist pressure, and what the reader must fear. Try one of
+                  these prompts to begin.
                 </p>
                 <div className="prompt-grid">
                   {quickPrompts.map((prompt) => (
@@ -235,7 +234,7 @@ export default function Home() {
 
           <form className="chat-input" onSubmit={handleSubmit}>
             <textarea
-              placeholder="Describe your tree and the symptom you see..."
+              placeholder="Describe your premise or the scene that needs tension..."
               value={input}
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={(event) => {
@@ -251,11 +250,10 @@ export default function Home() {
           </form>
 
           <div className="footer-note">
-            Bonsai Sensei answers from a curated care library and adapts to your
-            cues.
+            Suspense Studio answers from a curated thriller craft library.
           </div>
         </section>
       </main>
     </div>
   );
-}
+}

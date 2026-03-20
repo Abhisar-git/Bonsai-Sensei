@@ -14,11 +14,11 @@ const body = Space_Grotesk({
   variable: "--font-body",
 });
 
-export const metadata: Metadata = {
-  title: "Bonsai Sensei",
-  description:
-    "A focused bonsai care chatbot with seasonal guidance, rituals, and calm, practical advice.",
-};
+export const metadata: Metadata = {
+  title: "Suspense Studio",
+  description:
+    "A focused suspense thriller writing coach with structure, tension craft, and scene diagnostics.",
+};
 
 export default function RootLayout({
   children,
